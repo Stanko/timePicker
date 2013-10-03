@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TimePicker &bull; awesome JavaScript picker</title>
+	<link rel="stylesheet" href="css/demo.css" />
+	<link rel="stylesheet" href="css/timePicker.css" />
+</head>
+<body>
+
+<h1>TimePicker</h1>
+
+<p>
+Use up/down to change time, left/right to change between fields.
+</p>
+<p class="marginBottom30">
+	Documentation and readme on <a href="https://github.com/Stanko/timePicker">GitHub</a>.
+</p>
+
+
+<div class="marginBottom10">
+	<input class="tp timePicker1" value="10:35:00"> Default options
+</div>
+<div class="marginBottom10">
+	<input class="tp timePicker2" value="12:45:09"> Show seconds, change steps (5 minutes per step, 1 second)
+</div>
+<div class="marginBottom10">
+	<input class="tp timePicker3" value="23:23:53"> Leave input, show seconds and imperial
+</div>
+
+
+<h3>Default options</h3>
+<pre>
+this.options = {
+    stepHours: 1,
+    stepMinutes: 1,
+    stepSeconds: 10,
+    showSeconds: false,
+    hideInput: true,
+    imperial: false
+};
+</pre>
+
+<script src="js/rocketHelpers.js"></script>
+<script src="js/timePicker.js"></script>
+<script src="js/demo.js"></script>
+
+</body>
+</html>

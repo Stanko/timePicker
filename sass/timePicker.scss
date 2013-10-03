@@ -1,0 +1,67 @@
+@mixin border-box(){
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+@mixin unselectable(){
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+$background: #fff;
+$borderColor: #ddd;
+
+.RLTimePicker{
+	@include border-box();
+	display: inline-block;
+	border-radius: 3px;
+	border: 1px solid $borderColor;
+	background: $background;
+	//padding: 5px;
+
+	&.show{
+		display: block;
+	}
+
+	input{
+		@include border-box();
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		width: 38px;
+		padding: 8px 8px 6px;
+		margin: 0;
+		font-size: 18px;
+		text-align: center;
+		border: none;
+		border-bottom: 2px solid $background;
+		background: transparent;
+
+		&:focus{
+			border-bottom-color: #ace;
+			outline: none;
+		}
+
+		&.imperial{
+			width: 45px;
+		}
+	}
+
+	&:after, &:before{
+	    top: -20px;
+	    left: 15px;
+	    border: 10px solid transparent;
+	    content: " ";
+	    height: 0;
+	    width: 0;
+	    position: absolute;
+	    pointer-events: none;
+	    border-bottom: 10px #fff solid;
+	}
+	&:before{
+		border-bottom: 10px #ddd solid;
+		width: 2px;
+		margin-left: -1px;
+	}
+}
