@@ -34,8 +34,9 @@ TimePicker = function (element, options){
 
 	this.options = RL.mergeObjects(this.options, options);
 
-	this.setValue(this.el.value);
+	this.setValue(this.el.getAttribute('value'));
 	this.buildHTML();
+
 	this.refreshInputs();
 	this.bindEvents();
 };
