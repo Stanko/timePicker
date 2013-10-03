@@ -8,8 +8,9 @@ var keycodes = {
 	LEFT_ARROW: 37,
 	UP_ARROW: 38,
 	RIGHT_ARROW: 39,
-	DOWN_ARROW: 40
-
+	DOWN_ARROW: 40,
+	A: 65,
+	Z: 90
 };
 
 TimePicker = function (element, options){
@@ -33,12 +34,68 @@ TimePicker = function (element, options){
 
 	this.options = RL.mergeObjects(this.options, options);
 
-	console.log(this.options);
-
 	this.setValue(this.el.value);
 	this.buildHTML();
 	this.refreshInputs();
 	this.bindEvents();
+};
+
+TimePicker.prototype.buildHTML = function() {
+	// Container div
+	this.pickerDiv = document.createElement('div');
+	this.pickerDiv.className += ' RLTimePicker';
+
+	// Inputs
+	this.hoursInput = document.createElement('input');
+	this.hoursInput.className += ' hours';
+	this.hoursInput.value = this.value.hours;
+	this.hoursInput.setAttribute('maxlength', 2);
+
+	this.minutesInput = document.createElement('input');
+	this.minutesInput.className += ' minutes';
+	this.minutesInput.value = this.value.minutes;
+	this.minutesInput.setAttribute('maxlength', 2);
+
+	if(this.options.showSeconds){
+		this.secondsInput = document.createElement('input');
+		this.secondsInput.className += ' seconds';
+		this.secondsInput.value = this.value.seconds;
+		this.secondsInput.setAttribute('maxlength', 2);
+	}
+
+	if(this.options.imperial){
+		this.imperialInput = document.createElement('input');
+		this.imperialInput.className += ' imperial';
+		this.imperialInput.value = this.getImperial();
+		this.imperialInput.setAttribute('maxlength', 2);
+	}
+
+
+	var colonDiv1 = document.createElement('span'), colonDiv2 = document.createElement('span'), colonDiv3 = document.createElement('span');
+	colonDiv1.innerHTML = ':';
+	colonDiv2.innerHTML = ':';
+	colonDiv3.innerHTML = ':';
+
+	// Appending elements
+	this.pickerDiv.appendChild(this.hoursInput);
+	this.pickerDiv.appendChild(colonDiv1);
+	this.pickerDiv.appendChild(this.minutesInput);
+
+	if(this.options.showSeconds){
+		this.pickerDiv.appendChild(colonDiv2);
+		this.pickerDiv.appendChild(this.secondsInput);
+	}
+	if(this.options.imperial){
+		this.pickerDiv.appendChild(colonDiv3);
+		this.pickerDiv.appendChild(this.imperialInput);
+	}
+
+	RL.after(this.el, this.pickerDiv);
+
+	if(this.options.hideInput){
+		this.el.style.display = 'none';
+	}
+
 };
 
 TimePicker.prototype.toString = function(){
@@ -117,64 +174,6 @@ TimePicker.prototype.refreshInputs = function() {
 	this.el.value = this.toString();
 };
 
-TimePicker.prototype.buildHTML = function() {
-	// Container div
-	this.pickerDiv = document.createElement('div');
-	this.pickerDiv.className += ' RLTimePicker';
-
-	// Inputs
-	this.hoursInput = document.createElement('input');
-	this.hoursInput.className += ' hours';
-	this.hoursInput.value = this.value.hours;
-	this.hoursInput.setAttribute('maxlength', 2);
-
-	this.minutesInput = document.createElement('input');
-	this.minutesInput.className += ' minutes';
-	this.minutesInput.value = this.value.minutes;
-	this.minutesInput.setAttribute('maxlength', 2);
-
-	if(this.options.showSeconds){
-		this.secondsInput = document.createElement('input');
-		this.secondsInput.className += ' seconds';
-		this.secondsInput.value = this.value.seconds;
-		this.secondsInput.setAttribute('maxlength', 2);
-	}
-
-	if(this.options.imperial){
-		this.imperialInput = document.createElement('input');
-		this.imperialInput.className += ' imperial';
-		this.imperialInput.value = this.getImperial();
-		this.imperialInput.setAttribute('maxlength', 2);
-	}
-
-
-	var colonDiv1 = document.createElement('span'), colonDiv2 = document.createElement('span'), colonDiv3 = document.createElement('span');
-	colonDiv1.innerHTML = ':';
-	colonDiv2.innerHTML = ':';
-	colonDiv3.innerHTML = ':';
-
-	// Appending elements
-	this.pickerDiv.appendChild(this.hoursInput);
-	this.pickerDiv.appendChild(colonDiv1);
-	this.pickerDiv.appendChild(this.minutesInput);
-
-	if(this.options.showSeconds){
-		this.pickerDiv.appendChild(colonDiv2);
-		this.pickerDiv.appendChild(this.secondsInput);
-	}
-	if(this.options.imperial){
-		this.pickerDiv.appendChild(colonDiv3);
-		this.pickerDiv.appendChild(this.imperialInput);
-	}
-
-	RL.after(this.el, this.pickerDiv);
-
-	if(this.options.hideInput){
-		this.el.style.display = 'none';
-	}
-
-};
-
 TimePicker.prototype.getImperial = function() {
 	if(this.value.hours > 12){
 		return this.options.pm;
@@ -199,16 +198,24 @@ TimePicker.prototype.bindEvents = function() {
 	this.hoursInput.onkeydown = function(e){ $this.hoursKeyDown(e); };
 	this.minutesInput.onkeydown = function(e){ $this.minutesKeyDown(e); };
 
+	this.hoursInput.onblur = function(e){ $this.onBlur(e); };
+	this.minutesInput.onblur = function(e){ $this.onBlur(e); };
+
 	if(this.options.showSeconds){
 		this.secondsInput.onkeydown = function(e){ $this.secondsKeyDown(e); };
+		this.secondsInput.onblur = function(e){ $this.onBlur(e); };
 	}
 	if(this.options.imperial){
 		this.imperialInput.onkeydown = function(e){ $this.imperialKeyDown(e); };
+		this.imperialInput.onblur = function(e){ $this.onBlur(e); };
 	}
 };
 
 
 TimePicker.prototype.hoursKeyDown = function(e) {
+	if(this.disableLetterInput(e)){
+		return;
+	}
 	switch(e.keyCode){
 		case keycodes.UP_ARROW :
 			RL.preventDefault(e);
@@ -228,6 +235,9 @@ TimePicker.prototype.hoursKeyDown = function(e) {
 
 };
 TimePicker.prototype.minutesKeyDown = function(e) {
+	if(this.disableLetterInput(e)){
+		return;
+	}
 	switch(e.keyCode){
 		case keycodes.UP_ARROW :
 			RL.preventDefault(e);
@@ -256,6 +266,9 @@ TimePicker.prototype.minutesKeyDown = function(e) {
 };
 
 TimePicker.prototype.secondsKeyDown = function(e) {
+	if(this.disableLetterInput(e)){
+		return;
+	}
 	switch(e.keyCode){
 		case keycodes.UP_ARROW :
 			RL.preventDefault(e);
@@ -281,6 +294,7 @@ TimePicker.prototype.secondsKeyDown = function(e) {
 };
 
 TimePicker.prototype.imperialKeyDown = function(e) {
+	//this.disableLetterInput(e);
 	switch(e.keyCode){
 		case keycodes.UP_ARROW :
 		case keycodes.DOWN_ARROW :
@@ -298,4 +312,39 @@ TimePicker.prototype.imperialKeyDown = function(e) {
 			}
 			break;
 	}
+};
+
+TimePicker.prototype.disableLetterInput = function(e) {
+	if (!e.ctrlKey && !e.metaKey) {
+		if(e.keyCode >= keycodes.A && e.keyCode <= keycodes.Z){
+			RL.preventDefault(e);
+			return true;
+		}
+	}
+	return false;
+};
+
+TimePicker.prototype.onBlur = function(e) {
+	var hours = parseInt(this.hoursInput.value, 10),
+		minutes = parseInt(this.minutesInput.value, 10);
+
+	if(this.options.showSeconds){
+		var seconds = parseInt(this.secondsInput.value, 10);
+		if(!isNaN(seconds)){
+			this.value.seconds = seconds;
+		}
+	}
+
+	if(!isNaN(hours)){
+		this.value.hours = hours;
+		if(this.options.imperial && this.imperialInput.value == this.options.pm){
+			this.value.hours += 12;
+		}
+	}
+	if(!isNaN(minutes)){
+		this.value.minutes = minutes;
+	}
+
+
+	this.refreshInputs();
 };
