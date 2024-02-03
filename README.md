@@ -3,9 +3,7 @@ timePicker
 
 Plain JavaScript time picker.
 
-Soon detailed readme.
-
-[Click here for demo](http://stanko.github.io/timePicker/). Yay, let us see it live :)
+[Click here for demo](http://stanko.github.io/timePicker/).
 
 
 Defaults:
